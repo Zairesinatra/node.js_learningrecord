@@ -1,0 +1,43 @@
+1.模块化的好处
+2.CommonJS规定了哪些内容
+3.说出Node.js模块的三大分类是什么
+4.npm管理包
+5.规范化的包结构
+6.模块的加载机制
+
+·什么是模块化
+	准守固定规则,把大文件拆分为独立且依赖的多个小模块-复用、可维护、按需加载
+·模块化规范
+	引用模块的语法格式
+	模块中向外暴露的语法格式
+·node模块分类
+	内置模块(如fs、path、http)
+	自定义模块(.js)
+	第三方模块(需下载第三方的开发)
+·加载模块
+	require()方法 =>require()方法加载其他模块,会执行被加载模块的代码
+		内置与第三方模块:const xxx = require('xxx')
+		自定义模块:const xxx = require('./xxx.js') =>此处需要给路径的标识符\自定义模块会自动补全js文件
+·模块作用域-模块级别访问限制
+	自定义模块的变量、方法仅在当前的模块内访问-导入的模块console.log输出是空对象{}
+	优点:防止变量污染-导入脚本
+·module对象
+	向外共享模块作用域中的成员
+	每个.js自定义模块都有module对象,储存当前模块有关的信息(属性):path、filename、exports:{}...
+	外界(其他js代码)导入自定义模块得到的成员其实是导入module.exports属性,即一个空对象
+·暴露成员的注意点
+	永远以module.exports指向的对象为准
+·exports对象
+	Node提供exports对象.默认module.exports与exports指向同一对象.最终以module.exports指向对象为准
+·使用误区
+	谨记module.exports赋值指向
+	尽量仅使用一种,防止混乱
+·Node中CommonJS模块化规范
+	Node遵循CommonJS模块化规范,CommonJS规定模块的特性和各模块之间如何互相依赖
+	CommonJS规定
+		·每个模块内部,module变量代表当前模块
+		·module变量是一个对象,她的exports属性即(module.exports)是对外接口
+		·加载某个模块,其实是加载该模块的module.exports属性.require()方法用于加载模块
+·
+·
+·
