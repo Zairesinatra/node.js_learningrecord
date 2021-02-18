@@ -1,0 +1,65 @@
+1.能够使用express.static()快速托管静态资源
+2.使用express路由精简项目结构
+3.常见的express中间件
+4.express创建API接口
+5.在express中启动cors跨域资源共享
+
+·什么是express
+	node提供快速极简的web开发框架-创建web服务器
+·安装
+	npm i express@4.17.1 
+·快速创建基本Web服务器
+	导入、实例化、监听
+		const express = require('express')
+		const app = express()
+		app.listen(80,()=>{console.log('express server running at http://127.0.0.1')})
+·监听客户端请求
+	1.监听get请求	app.get('自定义url',function(req , res){res.send(JSON)}
+	2.监听post请求	app.post('自定义url',function(req , res){res.send('txt')}
+	3.内容响应給客户端res.send(http模块是res.end())
+·获取URL中携带的查询参数
+	用户端使用 ?name=zs&age=23 这种查询字符串形式,发送到服务器的参数
+	通过Express中的res.query对象获取客户端发送过来的 查询参数
+	默认 req.query为空对象
+	app.get('/',(req , res)=>{console.log(req.query)res.send(req.query)})
+·获取URL中的动态参数
+	通过req.params对象,可以访问到URL,通过:匹配到的动态参数
+	req.params默认为空对象
+	app.get('/zs/:id',(req , res)=>{console.log(req.params)})
+		注意点:
+			1. : 是固定写法,后面的字符串(id)自定义=>返回对象中的键值对是'自定义字符串':value(客户端填写)
+			2.可进行多个动态参数匹配=>'自定义URL/:id/:idd'
+·托管静态资源
+	express提供函数express.static(),方便创建一个静态资源服务器
+	先调用use()函数再调用express.static()方法
+	如下代码,可将public目录(文件夹)下图片、CSS文件、JS代码对外开放访问
+	app.use(express.static('public'))
+	注意:Express在指定静态目录中查找文件,并对外提供资源的访问路径.因此存放静态资源的目录名不会出现在URL中
+·托管多个静态资源目录
+	若托管多个静态资源目录则多次调用express.static()函数
+	app.use(express.static('fileA'))
+	app.use(express.static('fileB'))
+	访问静态资源文件时,express.static()函数会根据目录添加顺序查找所需文件(比如存在相同名称的文件)
+·nodemon
+	npm install -g nodemon
+	node js => nodemon js
+·express路由
+	路由是客户端请求与服务器处理函数之间的映射关系
+	组成:请求类型、请求URL、处理函数
+·路由的匹配过程
+	按照路由的顺序进行匹配-请求类型与url类型同时匹配成功则交给对应的function
+	谁前谁优先级高
+·模块化路由(创建+注册)
+	//创建
+	1.创建路由对应js
+	2.调用express.Router()创建路由对象
+	3.路由对象挂载具体路由
+	4.module.exports向外共享路由对象
+	//注册
+	5.app.use(zsRouter)函数注册路由模块(此前const zsRouter = require('./router'))
+·app.use()函数
+	注册全局中间件
+·为路由添加访问前缀
+	app.use('/前缀',zsRouter)
+·
+·
