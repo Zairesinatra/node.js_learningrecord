@@ -1,0 +1,51 @@
+CORS跨域资源共享
+·接口的跨域问题
+	1.CORS-主流推荐
+	2.JSONP-仅GET请求
+·使用cros中间件解决跨域问题
+	1.运行 npn install cors安装中间件
+	2.const cors = require('cors')导入中间件
+	3.调用app.use(cors())配置中间件
+·什么是CORS
+	组成:一系列的HTTP响应请求头-决定了浏览器是否阻止前端JS代码跨域获取资源
+	同源安全策略阻止跨域;接口服务器配置CORS相关HTTP响应头解除浏览器端跨域访问限制
+·CORS响应头-Access-Control-Allow-Origin
+	响应头携带Access-Control-Allow-Origin字段,语法如下
+	Access-Control-Allow-Origin:<origin> | * 	(解释:具体域名或者星号)
+		origin参数指的是允许访问该资源的外域URL
+			(例:以下字段只允许来自 http://xxx.cn 的请求)
+			res.setHeader('Access-Control-Allow-Origin','http://xxx.cn')
+		*通配符表示允许来自任何域的请求
+			res.setHeader('Access-Control-Allow-Origin','*')
+·CORS响应头-Access-Control-Allow-Headers
+	默认情况CORS仅支持客户端向服务器发送如下的9个请求头:
+		Accept\Accept-Language\Content-Language\DPR\Downlink\Save-Date\Viewport-Width\width\Content-Type(仅限于text\plain、multipart\form-data、application\x-www-form-urlencoded)
+·CORS响应头-Access-Control-Allow-Methods
+	默认情况CORS仅支持客户端发起GET、POST、HEAD请求。如果客户端希望通过PUT、DELETE等方式请求服务器的资源,则需要在服务器端,通过Access-Control-Allow-Methods指明实际请求所允许的HTTP方法
+	//仅允许 POST、GET、DELETE、HEAD 请求方法
+	res.setHeader('Access-Control-Allow-Methods','POST、GET、HEAD')
+	//允许所有的 HTTP 请求方法
+	res.setHeader('Access-Control-Allow-Methods','*')
+·CORS请求的分类
+	客户端在请求CORS时,根据请求方式与请求头不同,可以将CORS分为两大类:简单请求、预检请求
+		简单请求:1.请求方式:GET、POST、HEAD 2.HTTP头部信息不超过以下几种字段:无自定义头部字段...
+		预检请求:复合以下任何一条件都是预检请求
+			1.请求方式为GET、POST、HEAD以外的请求METHOD类型
+			2.请求头包含自定义头部字段
+			3.向服务器发送了 application\json 格式的数据
+		浏览器与服务器正式通信之前,浏览器会先发送OPTION请求进行预检,以获知服务器是否允许该实际请求.故这一次OPTION称为预检请求.服务器成功响应预检请求后,才会发送真正的请求,携带真实的数据.
+·简单请求和与预检请求的区别:
+	客户端与服务器间发生一次请求=>简单请求
+	客户端与服务器之间会发送两次请求,OPTION预检请求成功后,才会发起真正的请求=>预检请求(firefox)
+·JSONP接口
+	浏览器端通过<script>标签的src属性,请求服务器上的数据,同时服务器返回一个函数的调用.这种请求数据的方式叫做JSONP
+	特点:JSONP不属于真正的Ajax请求,因为没有使用XMLHttpRequest这个对象、仅支持GET请求,不支持POST、PUT、DELETE等请求
+·创建JSONP接口的注意事项
+	如果项目中已经配置了CORS跨域资源共享,为防止冲突,必须在配置CORS中间件之前声明JSONP的接口.否则JSONP接口会被处理成开启了CORS的接口
+·JSONP接口实现步骤
+	获取客户端发过来的回调函数的名字
+	要得到通过JSONP形式发送给客户的数据
+	拼接出一个函数调用的字符串
+	上一步拼接的字符串,响应给客户端的<script>标签进行解析执行
+·JSONP理解
+	客户端通过<script>发送函数名给服务器,服务器通过函数名,准备数据,拼接函数调用字符串返回
