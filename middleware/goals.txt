@@ -1,0 +1,109 @@
+Express中间件
+·中间件
+	中间处理环节
+·生活例子
+	加工程序
+·调用流程
+	request送达express层层中间件传递给router响应给客户端
+·中间件格式
+	const express = require('express')
+	const app = express()
+	app.get('/',function(req , res , next){next()}
+·next函数作用
+	实现连续调用、关联下一中间件或router
+·定义中间件函数
+	const mw = function(req , res , next){console.log('这是最简单的中间件')next()}
+·全局生效的中间件
+	用户发起的请求,到达服务器后,都会触发的中间件
+	app.use(中间件函数)定义一个全局生效的中间件
+·定义全局中间件的简化形式
+	app.use(function(req, res, next){console.log('这是一个最简单的中间件函数')next()})
+·中间件的作用
+	中间件之间共享一份req和res.基于这样的特性,我们可以在上游的中间件统一为req或res对象添加自定义的属性或方法,供下游的中间件或路由使用
+·定义多个全局中间件
+	使用app.use()连续定义多个全局中间件.客户端请求到达服务器后,会按照中间件定义的先后顺序依次调用
+·局部生效中间件
+	不用app.use()定义的中间件,叫做局部生效的中间件
+	const mw1 = function(req, res, next){console.log('这是中间件函数')next()}
+	app.get('/zy',mw1,(req, res)=>res.send('Locally effective middleware'))
+·定义多个局部中间件
+	app.get('/zzyy',mw1, mw2,(req, res)=>{res.send('multiple locally effective middleware')})
+	app.get('/zzyy',[mw1, mw2],(req, res)=>{res.send('multiple locally effective middleware')})
+·五个使用注意事项
+	1.路由之前注册中间件
+	2.客户端发来的请求可连续调用多个中间件处理
+	3.执行完中间件业务代码后,不要忘记调用next()函数
+	4.防止代码逻辑混乱,调用next()后不要再补代码
+	5.连续调用多个中间件,多个中间件之间共享req和res对象
+·中间件的分类
+	1.应用级别中间件-叫法-中间件绑定到app实例上
+		通过app.use()、app.get()、app.post()绑定到app实例上的中间件叫做应用级别的中间件
+		//全局中间件
+		app.use(req, res, next()=>{next()})
+		//局部中间件
+		app.get('/',mw1, mw2,(req, res=>{res.send('middlware')}))
+	2.路由级别中间件
+		绑定到express.Router()实例上的中间件,用法与应用级别的中间件没有任何区别,只不过应用级别的中间件绑定到app实例上,而路由级别的中间件是绑定到router实例上
+		var app = express()
+		var router = express.Router()
+		router.use(function(req, res, next{console.log('Time' , Date.now())next}))
+		app.use('/',router)
+	3.错误级别中间件---!!!注册在所有路由之后
+		捕获项目中的异常错误,防止项目异常崩溃的问题
+		格式:错误级中间件的function()处理函数中间必须有4个形参,分别是(err, req, res, next)
+		//抛出自定义的错误
+		app.get('/',function(req, res){throw new Error('服务器内不发生错误!')res.send('ErrorError')})
+		//发生错误但不会崩溃
+		app.use(function(err, req, res, next){console.log('发生了错误'+err.message)res.send('error!'+err.message))}
+	4.Express内置中间件
+		express.static-快速托管静态资源-无兼容性
+		express.json-解析JSON格式的请求体数据(4.16.0+)
+			//配置解析 application/json 格式数据的内置中间件
+			app.use(express.json())
+		express.urlencoded-解析URL-encoded格式的请求数据(4.16.0+)
+			//配置解析 application/x-www-form-urlencoded格式数据的内置中间件
+			app.use(express.urlencoded({extended:false}))
+	5.第三方中间件
+		需下载配置非Express官方内置中间件
+		nom install body-parser
+		require导入
+		app.use()注册并使用
+·自定义中间件
+	需求描述与实现步骤:手动模拟一个类似于express.urlencoded中间件,解析POST提交到服务器的表单数据
+	实现步骤:
+		1.定义中间件
+		app.use((req, res, next)=>{监听})
+		2.监听req的data事件
+		3.监听req的end事件
+		4.使用querystring模块接续请求体数据
+			node内置一个querystring模块专门查询字符串,通过这个模块提供的parse()函数可以将查询字符串解析成对象的格式
+			//导入处理 quertstring 的 node.js 内置模块
+			const qs = require('querystring')
+			//调用 qs.parse() 方法,查询字符串传解析为对象
+			const body = qs.parse(str)
+		5.解析出来的数据对象挂载req.body
+			上游中间件和下游的中间件以及路由之间,共享一份req和res.因此将解析出来的数据挂载为req的自定义属性,命名为req.body供下有使用
+			const body = qs.parse(str)
+			req.body = body
+			next()
+		6.自定义中间件封装为模块
+			//封装为独立的模块
+			const qs = require('querystring')
+			function bodyParser(req, res, next){/*省略其他代码*/}
+			//向外导出请求体数据的中间件函数
+			module.exports = bodyParser
+			----------------分割线-----------------
+			//1.导入自定义的中间件模块
+			const myBodyParser = require('custom-body-parser')
+			//2.注册自定义的中间件模块
+			app.use(myBodyParser)
+
+·使用express写接口
+		导入-创建服务器实例-调用listen
+·
+·
+·
+·
+·
+·
+
