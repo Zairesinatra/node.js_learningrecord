@@ -1,0 +1,109 @@
+1.知道如何配置MySQL
+2.认识并使用常见的SQL语句操作数据库
+3.Express中操作MySQL
+4.了解Session实现原理
+5.了解JWT实现原理
+·数据库概念
+	数据库是组织、存储、管理数据的仓库
+	增、删、改、查
+·数据库分类
+	MySQL、Oracle、Mongodb数据库
+	传统数据库:MySQL、Oracle、SQL Server
+	新型数据库:Mongodb
+·传统型数据库的 数据组织结构
+	参照EXCEL(工作簿、工作行、数据行、列)
+·传统型数据库的数据组织结构
+	数据库、数据表、数据行、字段
+·实际开发中库、表、行、字段的关系
+	每个项目独立的数据库
+	不同数据存储数据库不同数据表中(用户、图书)
+	表中具体信息由字段决定
+	字段相当于不同的属性信息
+	行代表具体的数据
+·安装什么
+	MySQL Server:提供数据储存
+	MySQL Workbench:可视化MySQL管理工具-方便操作存储的数据 
+·密码
+	admin123
+·MySQL操作
+	·使用MySQL Workbench管理数据库
+		1.连接数据库
+		2.MySQL Workbench页面组成:菜单栏、工具栏、数据库列表、信息区(不同数据库)、代码执行区、输出区
+		3.切换到schemas区域
+·创建数据库
+	桶桶-命名(不要中文和空格)-apply
+·创建数据表
+	1.展开my—db-01数据库 => 在Tables节点上鼠标右键 => 选择Create Table => 输入数据表的名称users => 可选描述当前表的作用 => 设计表的字段 => 创建表
+	2. id相当于身份证号、status可以表示用户正常状态或者被禁用了
+	3. varchar:字符串、tinyint(1)布尔值
+	4.特殊表示:
+		PK(primary key):主键唯一标识
+		NN(not null):值不允许为空
+		UQ(Unique):值唯一
+		AI(Auto Increment):值自动增长
+·SQL
+	structured query language 结构化查询语言,访问与处理数据库的编程语言,以编程的语言操作数据库中数据
+	关键点:
+		SQL是一门数据库编程语言
+		使用SQL语言编写出来的代码叫做SQL语句
+		SQL语句仅在关系型数据库中使用(例如MySQL、Oracle、SQL Server)
+·SQL能做什么
+	查询数据、插入数据、更新数据、删除数据
+·SQL四种语法
+	where条件、and和or运算符、order by排序、count(*)函数
+·SQL的SELECT语句
+	语法:SELECT语句用于 从表中查询数据 ,执行结果储存一个 结果表 中
+	-- 这是注释
+	-- 从FROM指定的表中查询 所有的 数据, * 表示所有列
+	SELECT * FROM 表名称
+	-- 从 FROM 指定的表中,查询出指定 列名称 的数据
+	SELECT 列名称 FROM 表名称
+·注意SQL关键字大小写不敏感
+·SQL的INSERT INTO语句
+	用于向数据表插入新的数据行
+	-- 语法解读:向指定的表中插入几列数据,列的值使用 values 一一指定
+	-- 注意: 列和值要一一对应,多个列和多个值之间,使用英文的都好分隔
+	INSERT INTO table_name (列1,列2,...) VALUE(值1,值2,...)
+·SQL的UPDATE语句
+	update语句用于修改表中的数据(更新某一行的某一列或者若干列)
+	-- UPDATE指定更新的哪个表、SET指定对应的新值、WHERE指定更新的条件(要更新的对象,如id=7)
+	UPDATE 表名称 SET 列名称 = 新值 WHERE 列名称 = 某值
+·SQL的DELETE语句
+	用于删除表中数据行
+	DELETE FROM 表名称 WHERE 列名称 = 值 
+·SQL的WHERE子句
+	用于限定选择标准.在SELECT、UPDATE、DELETE语句中皆可使用WHERE限定选择
+	SELECT 列名称 FROM 表名称 WHERE 列 运算符 值
+	UPDATE 表名称 SET 列=新值 WHERE 列 运算符 值
+	DELETE FROM 表名称 WHERE 列 运算符 值
+		注明:运算符中 <> 可以写为 !=
+·SQL的AND和OR运算符
+	AND和OR可以再WHERE子语句中把两个或多个条件结合起来
+	AND表示必须同时满足多个条件,相当于JS中&&运算符
+	OR表示满足任一条件即可,相当于JS中||运算符
+·SQL的ORDER BY子句
+	ORDER BY语句用于根据指定的列对结果集进行排序
+	ORDER BY语句默认按照升序对记录排序
+	希望按照降序排列则使用DESC关键字(升序是ASC)
+·SQL的ORDER BY子句
+	先按status字段降序排序再按照username升序排序
+	SELECT * FROM users ORDER BY status desc, username ASC
+·SQL的COUNT(*)函数
+	COUNT(*)函数用于返回查询结果的总数据条数
+	SELECT COUNT(*) FROM 表名称
+	使用AS为列设置别名
+·项目中操作MySQL
+	1.安装MySQL数据库的第三方模块mysql
+	2.通过mysql模块连接到MySQL
+	3.通过mysql模块执行SQL语句
+·安装与配置mysql模块
+	1.托管于npm:npm install mysql
+	此前通过 npm init -y => will simply generate an empty npm project without going through an interactive process. The -y stands for yes.
+	2.配置mysql
+		const mysql = require('mysql')
+		const db = mysql.createPool({
+			host:'127.0.0.1',
+			user:'root',
+			password:'admin123',
+			database:'my_db_01'
+		})
