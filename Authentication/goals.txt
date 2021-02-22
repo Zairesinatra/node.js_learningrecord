@@ -1,0 +1,86 @@
+Web开发模式
+    ·服务器端渲染的Web开发模式
+        服务器给客户端的HTML页面,通过在服务器字符串的动态拼接,动态生成.因此客户端不需要使用Ajax技术请求页面的数据
+        app.get('index.html',(req,res)=>{
+            const user = {name:'zs',age:23}
+            const html = `<h1>姓名:${user.name},年龄:${user.age}</h1>`
+            res.send(html)
+        })
+        优点:前端耗时少、有利于SEO  缺点:占用服务器端资源、开发效率低
+    ·前后端分离的web开发模式
+        后端提供API接口、前端调用Ajax接口
+        优点:开发体验好(jQuery+模板引擎、Vue.js、React...)、用户体验好、减轻了服务器端渲染的压力
+        缺点:不利于SEO-解决Vue\React的SSR(server side render)技术
+    ·如何使用Web开发模式
+        根据业务需求
+        企业级网站不需要太多的交互且需要良好的SEO则可以服务器渲染
+        而后台管理交互性较强不需要考虑SEO则可以使用前后端分离的开发模式
+    ·为什么要身份认证
+        确认当前声称某身份的用户确实是声称的用户
+            ·服务器端渲染推荐Session认证机制
+            ·前后端分离推荐JWT认证机制
+    ·Session认证机制
+        突破HTTP无状态限制
+        注意:现实生活中的会员卡认证方式,在Web开发中专业术语叫做Cookie
+        Cookie是存储在浏览器中的一段不超过4KB的字符串.由一个名字(Name)、值(Value)和其他几个用于控制Cookie有效期安全性、使用规范的可选属性组成
+        Cookie其实就是键值对,存储于浏览器的字符串中
+        不同域名下的Cookie各自独立,每当客户端发起请求,会自动把当前域名下所有未过期的域名一同发送服务器
+        特性：1.自动发送 2.域名独立 3.过期时限 4.字符串的4KB限制
+    ·Cookie身份认证中作用:
+        客户端第一次请求服务器的时候,服务器通过 响应头 形式,向客户端发送一个身份认证的Cookie,客户端会自动将Cookie保存在浏览器中.随后,每次客户端浏览器每次请求服务器时,浏览器会 自动 将身份认证相关的Cookie,通过请求头的形式 发送给服务器,服务器可验明客户端身份
+    ·实际开发中Cookie不具有安全性,浏览器有读写Cookie的API,因此Cookie容易被伪造
+    ·提高身份认证安全性
+        会员卡+刷卡认证
+    ·Session的工作原理
+        Cookie与服务器内存的关系
+    ·Express中使用Session认证
+        安装express-session中间件
+        导入 session中间件
+        配置使用app.use()注册session中间件
+        app.use(session({secret:'jiami',resave:false,saveuninitialized:true}))
+        // 配置成功后才有req.session这个属性
+
+        const express = require('express')
+        const app = express()
+        var session = require('express-session')
+        app.use(session({
+            secret:'zairesinatra',
+            resave:false,
+            saveUninitialized:true,
+        }))
+        // 配置express-session成功后才有req.session这个属性
+        // 将登陆成功后的用户信息保存到session
+        app.post('api/login',(req,res)=>{
+            if(req.body.username !== 'admin' || req.body.password !== '000000'){
+                return res.send({status:1,msg:'登录失败'})
+            }
+            req.session.user = req.body //用户信息
+            req.session.islogin = true //登陆状态
+
+            res.send({status:0,msg:'登陆成功'})
+        })
+
+        //从session上取数据
+        app.get('/api/username',(req,res)=>{
+            if(!req.session.islogin){
+                return res.send({status:1,msg:'fail'})
+            }
+            res.send({status:0,msg:'success',username:req.session.user.username})
+        })
+    ·JWT认证机制
+        了解session认证的局限性:session需要cookie才能实现,由于cookie不支持跨域访问,所以设计前端跨域请求后端接口需要额外配置
+        前后端不存在跨域请求则推荐session身份认证
+        前后端存在跨域请求则推荐JWT认证-JSON WEB Token
+    ·JWT工作原理
+        服务器加密来自浏览器的用户信息生成Token字符串不保留响应给客户端,客户端将其存储于Localstorage和SessionStorage.客户端再次发起请求则通过请求头的Authorization字段,将Token发送给服务器.服务器还原加密的Token,认证用户身份,生成特定的相应内容,再响应给客户端
+    ·JWT的组成部分
+        Header、Payload、Signature通过.分隔
+        Header.Payload.Signature
+            ·Header、Signature安全性相关、加密Token
+            ·Payload用户信息、加密生成的字符串
+    ·JWT使用方式
+        把JWT放在HTTP请求头的Authorization字段中
+        Authorization: Bearer <token>
+    ·使用JWT
+        1.安装JWT相关的包:    npm install jsonwebtoken(生成JWT字符串) express-jwt(还原JWT字符串为JSON对象)
+        2.require导入相关的包
